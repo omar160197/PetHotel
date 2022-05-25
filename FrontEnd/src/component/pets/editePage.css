@@ -1,0 +1,64 @@
+
+.order:not(:last-child)
+{
+    border-bottom: 1px solid #cfcbcb71;
+    padding-block:5px ;
+    transition: .5s;
+}
+.order:hover
+{
+    background-color: #e6e6e671;
+    scale:(1.1);
+    
+    cursor: pointer;
+}
+.order *
+{
+    margin: 0;
+    white-space: nowrap;
+}
+
+.divinput
+{
+    width:calc(50% - 10px) !important;
+}
+.title-pro
+{
+    font-size:14px;
+    font-weight: bold;
+    margin-bottom:5px;
+}
+.salary-pro ,
+.qty-pro
+{
+    font-size:12px;
+    margin-bottom:5px;
+}
+.orders
+{
+    height:330px ;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.peice
+{
+    font-size: 14px;
+    font-weight: bold;
+}
+.lable-price
+{
+    font-size: 14px;
+}
+.price-details
+{
+    border-top:1px solid #e6e6e6de;
+}
+.font-weight-bold
+{
+    font-weight: bolder;
+    color: #f68b1e !important;
+}
+.font-weight-bold-1
+{
+    background-color: #f68b1e !important;
+}

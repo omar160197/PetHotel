@@ -3,11 +3,11 @@ import { Box, ButtonBase, Container } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import "./editePage.css";
-import { useNavigate } from "react-router-dom";
-import { updatePets ,reset, getUserPets } from "../../store/pets/petSlice";
 
-const EditPage = ({setEditPage}) => {
+import { useNavigate } from "react-router-dom";
+import { updatePets ,reset, getUserPets, updateAdminPets } from "../../../store/pets/petSlice";
+
+const AdminEditPage = ({setEditPage}) => {
   const { isSuccess, isError, isLoading,selectPet } = useSelector((state) => state.pets);
   const {user}=useSelector((state)=>state.user)
    
@@ -30,7 +30,7 @@ const EditPage = ({setEditPage}) => {
     },
     onSubmit: (values) => {
       console.log(values);
-      dispatch(updatePets({ values, petId: selectPet._id ,ownerId:user._id}));
+      dispatch(updateAdminPets({ values,ownerId:user._id ,petId: selectPet._id }));
          
       if (isError) {
         console.log("error mesage");
@@ -153,4 +153,4 @@ const EditPage = ({setEditPage}) => {
     </Container>
   );
 };
-export default EditPage;
+export default AdminEditPage;

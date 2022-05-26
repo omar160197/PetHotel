@@ -99,7 +99,8 @@ export const getUserPets=createAsyncThunk(
                         type:userData.values.type,
                         breed:userData.values.breed,
                         size:userData.values.size,
-                        name:userData.values.name
+                        name:userData.values.name,
+                        ownerId:userData.ownerId
                       }
                 },
               });
@@ -113,6 +114,47 @@ export const getUserPets=createAsyncThunk(
         }
         );
 
+
+        export const updateAdminPets=createAsyncThunk(
+          'edit/pets',
+          async (userData,thunkAPI)=>{
+              console.log(userData);
+              const { rejectWithValue } = thunkAPI;
+              const EDIT_USER_PETS=gql`
+              mutation EditPet($editPetInput: EditPet) {
+                  editPet(editPetInput: $editPetInput) {
+                    ownerId
+                    _id
+                    type
+                    breed
+                    size
+                    name
+                  }
+                }
+              `;
+              const res = await axios.post("http://localhost:5000/", {
+                  query: print(EDIT_USER_PETS),
+                  variables: {
+                      editPetInput: {
+                          petId: userData.petId,
+                          type:userData.values.type,
+                          breed:userData.values.breed,
+                          size:userData.values.size,
+                          name:userData.values.name,
+                          ownerId:userData.ownerId  
+                        }
+                  },
+                });
+      
+                if (res.data.data.editPet !== null) {
+                  return res.data.data.editPet;
+                } else {
+                  console.log(res.data.errors[0].message);
+                  return rejectWithValue(res.data.errors[0].message);
+                }
+          }
+          );
+  
 
         export const createPets=createAsyncThunk(
           'post/pets',
@@ -174,7 +216,8 @@ export const getUserPets=createAsyncThunk(
                     query: print(ADD_USER_PETS),
                     variables: {
                       deletePetInput: {
-                        petId: userData,
+                        petId: userData.petId,
+                        ownerId:userData.ownerId
                           }
                     },
                   });

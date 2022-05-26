@@ -1,6 +1,6 @@
 const { ApolloError } = require("apollo-server-errors");
 const Booking = require("../../models/bookingSchema");
-
+const User =require('../../models/userSchema')
 module.exports = {
   Mutation: {
     async createBook(
@@ -25,7 +25,7 @@ module.exports = {
               petName:petName
             });
             const res = await newBooking.save().then(() => {
-              return Booking.find({});
+              return Booking.find({ownerId:ownerId});
             });
     
             return res;
@@ -40,7 +40,13 @@ module.exports = {
 
     async getAllBooking(_, { getBookingInput: { ownerId } }) {
       try {
-        const bookings = await Booking.find({ ownerId: ownerId });
+        const user = await User.find({_id:ownerId})
+        let bookings =''
+          if(user[0].username === 'Admin'){
+            bookings = await Booking.find({});    
+          }else{ 
+            bookings = await Booking.find({ ownerId: ownerId });  
+          }
         if (!bookings) {
           throw new ApolloError("cannot find any booking ");
         }
@@ -49,9 +55,14 @@ module.exports = {
         throw new ApolloError(err);
       }
     },
+    
 
-    async updateBooking(_, {updateBookingInput:{bookingId,from, to, fee, status, petId, note,petName}}) {
+    async updateBooking(_, {updateBookingInput:{ownerId,bookingId,from, to, fee, status, petId, note,petName}}) {
       try{
+        const owner = await User.findOne({ _id: ownerId });
+        let res = "";
+
+
         const booking =await Booking.findOne({_id:bookingId})
 
         booking.from=from
@@ -62,9 +73,16 @@ module.exports = {
         booking.note=note
         booking.petName=petName 
 
-        const res = await booking.save().then(() => {
+        if (owner.username !== "Admin") {
+          res = await booking.save().then(() => {
+            return Booking.find({ownerId:ownerId});
+          });
+        }else{
+           res = await booking.save().then(() => {
           return Booking.find({});
         });
+        }
+
 
         return res;
       }catch(err){
@@ -73,12 +91,19 @@ module.exports = {
 
     },
 
-    async deleteBooking(_, {deleteBookingInput:{bookId}}) {
+    async deleteBooking(_, { deleteBookingInput: { bookId, ownerId } }) {
       try {
-        const res = await Booking.deleteOne({ _id: bookId }).then(() => {
-          return Booking.find({});
-        });
-
+        const owner = await User.findOne({ _id: ownerId });
+        let res = "";
+        if (owner.username !== "Admin") {
+          res = await Booking.deleteOne({ _id: bookId }).then(() => {
+            return Booking.find({ownerId:ownerId});
+          });
+        }else{
+          res = await Booking.deleteOne({ _id: bookId }).then(() => {
+            return Booking.find({});
+          });
+        }
         return res;
       } catch (err) {
         throw new ApolloError("cannot update this pet " + err);

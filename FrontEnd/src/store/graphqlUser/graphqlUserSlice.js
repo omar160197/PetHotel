@@ -71,8 +71,44 @@ export const registerUser = createAsyncThunk(
 
     console.log(res);
     if (res.data.data.registerUser !== null) {
-      localStorage.setItem("user", JSON.stringify(res.data.data.registerUser));
+      // localStorage.setItem("user", JSON.stringify(res.data.data.registerUser));
       return res.data.data.registerUser;
+    } else {
+      console.log(res.data.errors[0].message);
+      return rejectWithValue(res.data.errors[0].message);
+    }
+  }
+);
+
+
+export const getAllUsers =createAsyncThunk(
+  "update/updateUser",
+  async (userData, thunkAPI) => {
+    console.log(userData);
+    const { rejectWithValue } = thunkAPI;
+
+    const LOGIN_USER = gql`
+    mutation GetUser($getUserInput: GetUserInput) {
+      getUser(getUserInput: $getUserInput) {
+        _id
+        username
+        email
+        password
+      }
+    }
+    `;
+
+    const res = await axios.post("http://localhost:5000/", {
+      query: print(LOGIN_USER),
+      variables: {
+        getUserInput: {
+          email: userData,
+        },
+      },
+    });
+    console.log(res);
+    if (res.data.data.getUser !== null) {
+      return res.data.data.getUser;
     } else {
       console.log(res.data.errors[0].message);
       return rejectWithValue(res.data.errors[0].message);
@@ -90,6 +126,7 @@ export const updateUser = createAsyncThunk(
       mutation UpdateUser($updateUserInput: UpdateInput) {
         updateUser(updateUserInput: $updateUserInput) {
           email
+          _id
           username
           password
         }
@@ -100,7 +137,7 @@ export const updateUser = createAsyncThunk(
       query: print(LOGIN_USER),
       variables: {
         updateUserInput: {
-          email: userData.email,
+          email: userData.values.email,
           password: userData.values.password,
           username: userData.values.username,
         },
@@ -108,7 +145,6 @@ export const updateUser = createAsyncThunk(
     });
     console.log(res);
     if (res.data.data.updateUser !== null) {
-      localStorage.setItem("user", JSON.stringify(res.data.data.updateUser));
       return res.data.data.updateUser;
     } else {
       console.log(res.data.errors[0].message);
@@ -116,6 +152,10 @@ export const updateUser = createAsyncThunk(
     }
   }
 );
+
+
+
+
 
 //Logout
 export const logout = createAsyncThunk("post/logout", async (_, thunkAPI) => {
@@ -131,6 +171,8 @@ let user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = {
   user: user ? user : null,
+  allUsers :[],
+  selectedUser:{},
   isLoading: false,
   isError: null,
   message: null,
@@ -146,6 +188,9 @@ export const graphqlUserSlice = createSlice({
       state.isError = false;
       state.isSuccess = false;
       state.message = "";
+    },
+    selectUser:(state,action)=>{
+     state.selectedUser=action.payload
     },
   },
   extraReducers: {
@@ -183,7 +228,7 @@ export const graphqlUserSlice = createSlice({
       console.log(action.payload);
       state.isLoading = false;
       state.isSuccess = true;
-      state.user = action.payload;
+      state.allUsers = action.payload;
     },
 
     [updateUser.rejected]: (state, action) => {
@@ -204,7 +249,7 @@ export const graphqlUserSlice = createSlice({
       state.isLoading = false;
       state.isSuccess = true;
       state.isError = false;
-      state.user = action.payload;
+      // state.user = action.payload;
     },
 
     [registerUser.rejected]: (state, action) => {
@@ -216,5 +261,5 @@ export const graphqlUserSlice = createSlice({
   },
 });
 
-export const { reset } = graphqlUserSlice.actions;
+export const { reset , selectUser} = graphqlUserSlice.actions;
 export default graphqlUserSlice.reducer;

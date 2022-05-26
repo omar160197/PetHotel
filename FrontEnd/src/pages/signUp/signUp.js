@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import { registerUser, reset } from "../../store/graphqlUser/graphqlUserSlice";
+import { loginUser, registerUser, reset } from "../../store/graphqlUser/graphqlUserSlice";
 import styles from "./signUp.module.css";
 
 
@@ -45,7 +45,10 @@ const SignUp=({loginStatus,setLoginStatus})=>{
         console.log("error mesage");
       }
       if (isSuccess || user) {
-        navigate("/home");
+        
+      navigate("/login");
+        
+        
       }
       dispatch(reset());
     },

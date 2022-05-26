@@ -45,7 +45,7 @@ export const getUserBook=createAsyncThunk(
     export const updateBookings=createAsyncThunk(
         'edit/bookings',
         async (userData,thunkAPI)=>{
-            console.log(userData.newPet[0].size);
+            console.log(userData.newPet[0]);
             let newFee=0
             if(userData.newPet[0].size === "small"){
               newFee=100
@@ -83,7 +83,8 @@ export const getUserBook=createAsyncThunk(
                           note:userData.values.note,
                           from:userData.values.from,
                           to:userData.values.to,
-                          petName:userData.newPet[0].name
+                          petName:userData.newPet[0].name,
+                          ownerId:userData.newPet[0].ownerId
                       }
                 },
               });
@@ -97,6 +98,54 @@ export const getUserBook=createAsyncThunk(
         }
         );
 
+
+        export const updateAdminBookings=createAsyncThunk(
+          'edit/bookings',
+          async (userData,thunkAPI)=>{
+              console.log(userData);
+             
+              const { rejectWithValue } = thunkAPI;
+              const Update_USER_PETS=gql`
+              mutation Mutation($updateBookingInput: UpdateBookingInput) {
+                updateBooking(updateBookingInput: $updateBookingInput) {
+                  _id
+                  from
+                  to
+                  fee
+                  status
+                  ownerId
+                  petId
+                  petName
+                  note
+                }
+              }
+              `;
+              const res = await axios.post("http://localhost:5000/", {
+                  query: print(Update_USER_PETS),
+                  variables: {
+                      updateBookingInput: {
+                            bookingId: userData.bookId,
+                            petId:userData.values.petId,
+                            fee:userData.values.fee,
+                            note:userData.values.note,
+                            from:userData.values.from,
+                            to:userData.values.to,
+                            petName:userData.values.petName,
+                            status:userData.values.status,
+                            ownerId:userData.ownerId
+                        }
+                  },
+                });
+      
+                if (res.data.data.updateBooking !== null) {
+                  return res.data.data.updateBooking;
+                } else {
+                  console.log(res.data.errors[0].message);
+                  return rejectWithValue(res.data.errors[0].message);
+                }
+          }
+          );
+  
 
         export const createBooking=createAsyncThunk(
           'post/bookings',
@@ -177,7 +226,8 @@ export const getUserBook=createAsyncThunk(
                     query: print(ADD_USER_PETS),
                     variables: {
                         deleteBookingInput: {
-                          bookId: userData,
+                          bookId: userData.bookId,
+                          ownerId:userData.ownerId
                           }
                     },
                   });
@@ -242,6 +292,25 @@ export const bookSlice =createSlice({
         state.isError = null;
       },
       [updateBookings.fulfilled]:(state,action)=>{
+         console.log(action.payload);
+         state.bookings=action.payload;
+         state.isLoading=false;
+         state.isError=false;
+         state.isSuccess=true; 
+      },
+      [updateAdminBookings.rejected]:(state,action)=>{
+          console.log(action)
+          state.isLoading = false;
+          state.isError = true;
+          state.message = action.payload;
+      },
+
+      [updateAdminBookings.pending]:(state,action)=>{
+        console.log(action);
+        state.isLoading = true;
+        state.isError = null;
+      },
+      [updateAdminBookings.fulfilled]:(state,action)=>{
          console.log(action.payload);
          state.bookings=action.payload;
          state.isLoading=false;

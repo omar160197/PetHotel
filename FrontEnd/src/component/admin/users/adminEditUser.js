@@ -3,34 +3,34 @@ import { Box, ButtonBase, Container } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import "./editePage.css";
-import { useNavigate } from "react-router-dom";
-import { updatePets ,reset, getUserPets } from "../../store/pets/petSlice";
 
-const EditPage = ({setEditPage}) => {
-  const { isSuccess, isError, isLoading,selectPet } = useSelector((state) => state.pets);
+import { useNavigate } from "react-router-dom";
+import { updatePets ,reset, getUserPets } from "../../../store/pets/petSlice";
+import { updateUser } from "../../../store/graphqlUser/graphqlUserSlice";
+
+const AdminEditUser = ({setEditPage}) => {
+  const { isSuccess, isError, isLoading,selectedUser } = useSelector((state) => state.user);
   const {user}=useSelector((state)=>state.user)
    
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const validationSchema = Yup.object({
-    name: Yup.string().required("Please Enter your pet name"),
-    breed: Yup.string().required("Please Enter your pet breed"),
-    size: Yup.string().required("Please Enter your pet size"),
-    type: Yup.string().required("Please Enter your pet type"),
+    username: Yup.string().required("Please Enter  username"),
+    email: Yup.string().required("Please Enter user email"),
+    password: Yup.string().required("Please Enter user password"),
+
   });
 
   const formik = useFormik({
     initialValues: {
-      name: selectPet.name,
-      breed: selectPet.breed,
-      size: selectPet.size,
-      type: selectPet.type,
-      
+      username: selectedUser.username,
+      email: selectedUser.email,
+      password: selectedUser.password,
+
     },
     onSubmit: (values) => {
       console.log(values);
-      dispatch(updatePets({ values, petId: selectPet._id ,ownerId:user._id}));
+      dispatch(updateUser({ values, userEmail: selectedUser.email }));
          
       if (isError) {
         console.log("error mesage");
@@ -48,71 +48,53 @@ const EditPage = ({setEditPage}) => {
           {/* ------------nameinput-------------- */}
           <div className=" d-flex form-recipts justify-content-between">
             <div className="mb-3 col-sm-12 col-md-12">
-              <label htmlFor="name" className="form-label">
-                PetName{" "}
+              <label htmlFor="username" className="form-label">
+              username{" "}
               </label>
               <input
                 className="form-control"
-                placeholder="Enter Your petName"
+                placeholder="Enter  userName"
                 type="text"
-                name="name"
-                {...formik.getFieldProps("name")}
+                name="username"
+                {...formik.getFieldProps("username")}
               />
-              {formik.touched.name && formik.errors.name ? (
-              <div style={{color:"red"}}>{formik.errors.name}</div>
+              {formik.touched.username && formik.errors.username ? (
+              <div style={{color:"red"}}>{formik.errors.username}</div>
             ) : null}
             </div>
             
           </div>
           {/* mobil input */}
           <div className="mb-3 col-sm-12 col-md-12 ">
-            <label htmlFor="breed" className="form-label">
-              breed
+            <label htmlFor="email" className="form-label">
+              email
             </label>
             <input
+            readOnly={'disapled'}
               className="form-control"
-              type="text"
-              placeholder="Enter Your Pet breed"
-              name="breed"
-              {...formik.getFieldProps("breed")}
+              type="email"
+              placeholder="Enter user email"
+              name="email"
+              {...formik.getFieldProps("email")}
             />
-            {formik.touched.breed && formik.errors.breed ? (
-              <div style={{color:"red"}}>{formik.errors.breed}</div>
+            {formik.touched.email && formik.errors.email ? (
+              <div style={{color:"red"}}>{formik.errors.email}</div>
             ) : null}
           </div>
 
           <div className="mb-3 col-sm-12 col-md-12 ">
-            <label htmlFor="type" className="form-label">
-              Pet Type
+            <label htmlFor="password" className="form-label">
+              password
             </label>
             <input
               className="form-control"
               type="text"
-              placeholder="Enter Your Pet Type"
-              name="type"
-              {...formik.getFieldProps("type")}
+              placeholder="Enter user password"
+              name="password"
+              {...formik.getFieldProps("password")}
             />
-            {formik.touched.type && formik.errors.type ? (
-              <div style={{color:"red"}}>{formik.errors.type}</div>
-            ) : null}
-          </div>
-
-          <div >
-            <label htmlFor="size" className="form-label">
-              Size :
-            </label>
-            <select 
-            style={{width:"15%",marginLeft:"3%",height:"30px"}}
-            name="size"
-            {...formik.getFieldProps("size")}
-            >
-              <option value="small">small</option>
-              <option value="meduim">meduim</option>
-              <option value="large">large</option>
-             
-            </select>
-            {formik.touched.size && formik.errors.size ? (
-              <div className="errorForm">{formik.errors.size}</div>
+            {formik.touched.password && formik.errors.password ? (
+              <div style={{color:"red"}}>{formik.errors.password}</div>
             ) : null}
           </div>
 
@@ -153,4 +135,4 @@ const EditPage = ({setEditPage}) => {
     </Container>
   );
 };
-export default EditPage;
+export default AdminEditUser;

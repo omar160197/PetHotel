@@ -5,10 +5,10 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import "./editePage.css";
 import { useNavigate } from "react-router-dom";
-import { updatePets ,reset, getUserPets, getOnePet } from "../../store/pets/petSlice";
-import { updateBookings } from "../../store/bookings/bookingSlice";
+import { updatePets ,reset, getUserPets, getOnePet } from "../../../store/pets/petSlice";
+import { updateAdminBookings } from "../../../store/bookings/bookingSlice";
 
-const EditBooking = ({setEditPage}) => {
+const AdminEditBooking = ({setEditPage}) => {
   const { isSuccess, isError, isLoading,pets,pet } = useSelector((state) => state.pets);
   const {selectBook}=useSelector((state)=>state.bookings)
   const {user}=useSelector((state)=>state.user)
@@ -37,21 +37,16 @@ const EditBooking = ({setEditPage}) => {
       note: selectBook.note,
       fee:selectBook.fee,
       petId:selectBook.petId,
+      status:selectBook.status,
       ownerId:selectBook.ownerId
     },
     onSubmit: (values) => {
       // console.log("hi");
       // dispatch(getOnePet(values.petId))
-      
-    let newPet=pets.filter((pet)=>{
-      return values.petId === pet._id   
-     })
-
     
-     console.log("newPet",newPet);
        
        console.log(values); 
-      dispatch(updateBookings({newPet , values, bookId: selectBook._id }));
+      dispatch(updateAdminBookings({ values, bookId: selectBook._id,ownerId:user._id }));
          
       if (isError) {
         console.log("error mesage");
@@ -69,25 +64,42 @@ const EditBooking = ({setEditPage}) => {
           {/* ------------nameinput-------------- */}
           <div className=" d-flex form-recipts justify-content-between">
             <div className="mb-3 col-sm-12 col-md-12">
-              <label htmlFor="petId" className="form-label">
+              <label htmlFor="petName" className="form-label">
                 PetName{" "}
               </label>
-              <select
-             
-            style={{width:"15%",marginLeft:"3%",height:"30px"}}
-            name="petId"
-            {...formik.getFieldProps("petId")}
-            >
-              {pets.map((mypet,index)=>(
-                 <option  key={index} value={mypet._id}>{mypet.name}</option>
-              ))}
-             
-            </select>
-              {formik.touched.petId && formik.errors.petId ? (
-              <div style={{color:"red"}}>{formik.errors.petId}</div>
+             <input
+              className="form-control"
+              type="text"
+              readOnly="readonly"
+              placeholder="Enter Your Book Start Time"
+              name="petName"
+              {...formik.getFieldProps("petName")}
+            />
+              {formik.touched.petName && formik.errors.petName ? (
+              <div style={{color:"red"}}>{formik.errors.petName}</div>
             ) : null}
             </div>
             
+          </div>
+
+          <div className="mb-3 col-sm-12 col-md-12 ">
+            <label htmlFor="status" className="form-label">
+              Status
+            </label>
+            <select
+             
+            style={{width:"15%",marginLeft:"3%",height:"30px"}}
+            name="status"
+            {...formik.getFieldProps("status")}
+            >
+                 <option value={'Booked'}>Booked</option>
+                 <option value={'Inprogress'}>Inprogress</option>
+                 <option value={'Completed'}>Completed</option>
+             
+            </select>
+            {formik.touched.status && formik.errors.status ? (
+              <div style={{color:"red"}}>{formik.errors.status}</div>
+            ) : null}
           </div>
           {/* mobil input */}
           <div className="mb-3 col-sm-12 col-md-12 ">
@@ -97,6 +109,7 @@ const EditBooking = ({setEditPage}) => {
             <input
               className="form-control"
               type="date"
+              
               placeholder="Enter Your Book Start Time"
               name="from"
               {...formik.getFieldProps("from")}
@@ -129,6 +142,7 @@ const EditBooking = ({setEditPage}) => {
             <input
               className="form-control"
               type="text"
+              readOnly="readonly"
               placeholder="Enter Your Book note"
               name="note"
               {...formik.getFieldProps("note")}
@@ -177,4 +191,4 @@ const EditBooking = ({setEditPage}) => {
     </Container>
   );
 };
-export default EditBooking;
+export default AdminEditBooking;

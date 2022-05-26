@@ -3,11 +3,13 @@ const User = require("../../models/userSchema");
 const { ApolloError } = require("apollo-server-errors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
+const Pets = require("../../models/petsSchema");
+const Booking = require("../../models/bookingSchema");
+require("dotenv").config();
 
 module.exports = {
   Mutation: {
-    async registerUser(_,{ registerInput: { username, email, password}}) {
+    async registerUser(_, { registerInput: { username, email, password } }) {
       //see if this user is already exists
       const oldUser = await User.findOne({ email });
       if (oldUser) {
@@ -26,7 +28,7 @@ module.exports = {
         email: email,
         password: encryptedPassword,
       });
-    
+
       //save the new user
       const res = await newUser.save();
       return {
@@ -35,8 +37,6 @@ module.exports = {
       };
     },
 
-
-    
     async loginUser(_, { loginUserInput: { email, password } }) {
       //check if email exists
       const checkUser = await User.findOne({ email });
@@ -66,53 +66,63 @@ module.exports = {
 
           return {
             id: checkUser.id,
-            token:token,
+            token: token,
             ...checkUser._doc,
           };
         }
       }
     },
 
+    async updateUser(_, { updateUserInput: { username, password, email } }) {
+      try {
+        const user = await User.findOne({ email: email });
+        console.log(user);
+        //encryption passord
+        // const salt = bcrypt.genSaltSync(10);
+        // var encryptedPassword = bcrypt.hashSync(password, salt);
 
-    async updateUser(_,{updateUserInput:{username,password,email}}){
-      console.log(email); 
+        user.username = username;
+        user.email = email;
+        user.password = password;
 
-     const user = await User.findOne({email})
-       //encryption passord
-       const salt = bcrypt.genSaltSync(10);
-       var encryptedPassword = bcrypt.hashSync(password, salt);
+        const res = await user.save().then(() => {
+          return User.find({});
+        });
 
-     user.username=username
-     user.email=email
-     user.password=password
-   
-     const res = await user.save()
-     return {
-       id: res.id,
-       ...res._doc,
-     };
-     },
+        return res;
+      } catch (err) {
+        throw new ApolloError("cannot update this user " + err);
+      }
+    },
 
+    async getUser(_, { getUserInput: { email } }) {
+      // console.log(email);
 
+      const users = await User.find({});
 
-     async getUser(_,{getUserInput:{email}}){
-      console.log(email); 
-  
-     const user = await User.findOne({email})
-     const res = user
-     return {
-       id: res.id,
-       ...res._doc,
-     };
-     },
-
-
-
+      return users;
+    },
   },
-
-
-
+  
+  // deleteMany
+  async deleteUser(_, { deleteUserInput: { email } }) {
+    try {
+      const user = await User.find({ email: email });
+      if (user && user.username !== "Admin") {
+        await Pets.deleteMany({ ownerId: user._id });
+        await Booking.deleteMany({ ownerId: user._id });
+        const res = await User.deleteOne({ email: email }).then(() => {
+          return User.find({});
+        });
+        return res;
+      } else {
+        throw new ApolloError("cannot delete admin email");
+      }
+    } catch (err) {
+      throw new ApolloError("cannot delete this user " + err);
+    }
+  },
   Query: {
-    user: (_,  {ID }) => User.findById(ID),
+    user: (_, { ID }) => User.findById(ID),
   },
 };

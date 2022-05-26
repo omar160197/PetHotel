@@ -18,6 +18,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import BookIcon from '@mui/icons-material/Book';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -26,8 +27,10 @@ import Pets from '../../component/pets/pets';
 import Profile from '../../component/profile/profile';
 import { useDispatch, useSelector } from 'react-redux';
 import { reset } from '../../store/graphqlUser/graphqlUserSlice';
-import Users from '../../component/users/users';
 import { getUserPets } from '../../store/pets/petSlice';
+import AdminPets from '../../component/admin/pets/adminBets';
+import AdminBooking from '../../component/admin/booking/adminBookings';
+import AdminUsers from '../../component/admin/users/adminUsers';
 
 const drawerWidth = 300;
 
@@ -192,7 +195,7 @@ if (user === null){
               }}>
               <ListItemButton>
                 <ListItemIcon>
-                  { <GitHubIcon 
+                  { <PeopleAltIcon  
                   sx={{color:`${currentPage === "users"?"#f62d37":""}`}}
                   />}
                 </ListItemIcon>
@@ -211,12 +214,22 @@ if (user === null){
         </List>}
  
       </Drawer>
-      <Main open={open}>
+
+      {user && user.username !== 'Admin' && <Main open={open}>
         <DrawerHeader />
-        {currentPage === 'booking' &&<Booking userId={user && user._id}></Booking>}
+        
+        {currentPage === 'booking' && <Booking userId={user && user._id}/>}
         {currentPage === 'pets' &&<Pets userId={user && user._id}/>}
-        {currentPage === 'users' &&<Users></Users>}
-      </Main>
+        {currentPage === 'users' &&<AdminPets></AdminPets>}
+      </Main>}
+
+      {user && user.username === 'Admin' && <Main open={open}>
+        <DrawerHeader />
+        
+        {currentPage === 'booking' && <AdminBooking userId={user && user._id}/>}
+        {currentPage === 'pets' &&<AdminPets userId={user && user._id}/>}
+        {currentPage === 'users' &&<AdminUsers/>}
+      </Main>}
     </Box>
   );
 }

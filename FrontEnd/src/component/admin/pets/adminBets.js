@@ -9,12 +9,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useDispatch, useSelector } from "react-redux";
-import { deletePets, getUserPets, selectPet } from "../../store/pets/petSlice";
+import { deletePets, getUserPets, selectPet } from "../../../store/pets/petSlice";
 import { useNavigate } from "react-router-dom";
-import EditPage from "./editPet";
-import AddPage from "./createPet";
+import AdminEditPage from "./adminEditBets";
 
-const Pets = ({userId}) => {
+
+const AdminPets = ({userId}) => {
 const [editPage,setEditPage]=React.useState(false)
 const [addPage,setAddPage]=React.useState(false)
 
@@ -35,7 +35,7 @@ const [addPage,setAddPage]=React.useState(false)
       <h3 style={{marginBottom: "3%", fontWeight: "bold", fontFamily: "tahoma"  }}>Pets</h3>
       {(!addPage && !editPage) &&
         <>
-      <Box>
+      {/* <Box>
         <ButtonBase
         onClick={()=>setAddPage(true)}
           type="submit"
@@ -55,12 +55,13 @@ const [addPage,setAddPage]=React.useState(false)
           ></i>
           New
         </ButtonBase>
-      </Box>
+      </Box> */}
 
     <TableContainer component={Paper} sx={{marginTop:"2%"}}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead sx={{backgroundColor:"#F0F2F5"}}>
           <TableRow>
+            <TableCell sx={{fontSize:"20px",textAlign:"center"}}>OwnerId</TableCell>
             <TableCell sx={{fontSize:"20px",textAlign:"center"}}>Name</TableCell>
             <TableCell sx={{fontSize:"20px",textAlign:"center"}} align="right">Type</TableCell>
             <TableCell sx={{fontSize:"20px",textAlign:"center"}} align="right">Breed</TableCell>
@@ -74,6 +75,9 @@ const [addPage,setAddPage]=React.useState(false)
               key={index}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
+              <TableCell sx={{fontSize:"16px",textAlign:"center"}} component="th" scope="row">
+              {row.ownerId}
+              </TableCell>
               <TableCell sx={{fontSize:"16px",textAlign:"center"}} component="th" scope="row">
               {row.name}
               </TableCell>
@@ -95,10 +99,10 @@ const [addPage,setAddPage]=React.useState(false)
     </TableContainer>
     </>
     }
-    {editPage && <EditPage setEditPage={setEditPage}/>}
-    {addPage && <AddPage setAddPage={setAddPage}/>}
+
+    {editPage && <AdminEditPage setEditPage={setEditPage}/>}
 
     </Box>
   );
 };
-export default Pets;
+export default AdminPets;

@@ -9,13 +9,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteBookings, getUserBook, selectBook } from "../../store/bookings/bookingSlice";
+import { deleteBookings, getUserBook, selectBook } from "../../../store/bookings/bookingSlice";
 import { useNavigate } from "react-router-dom";
-import { getOnePet } from "../../store/pets/petSlice";
-import EditBooking from "./editBooking";
-import AddPageBooking from "./createBooking";
+import { getOnePet } from "../../../store/pets/petSlice";
+import AdminEditBooking from "./adminEditBooking";
+// import AddPageBooking from "./createBooking";
 
-const Booking = ({ userId }) => {
+const AdminBooking = ({ userId }) => {
   const { bookings, isSuccess, isError, isLoading, message } = useSelector(
     (state) => state.bookings
   );
@@ -35,7 +35,7 @@ const Booking = ({ userId }) => {
       <h3 style={{ fontWeight: "bold", fontFamily: "tahoma" }}>Booking</h3>
       {(!addPage && !editPage) &&
       <>
-      <Box>
+      {/* <Box>
         <ButtonBase
          onClick={()=>setAddPage(true)}
           sx={{
@@ -54,12 +54,15 @@ const Booking = ({ userId }) => {
           ></i>
           New
         </ButtonBase>
-      </Box>
+      </Box> */}
 
       <TableContainer component={Paper} sx={{ marginTop: "2%" }}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead sx={{ backgroundColor: "#F0F2F5" }}>
             <TableRow>
+            <TableCell sx={{ fontSize: "20px", textAlign: "center" }}>
+                OwnerId
+              </TableCell>
               <TableCell sx={{ fontSize: "20px", textAlign: "center" }}>
                 Pet
               </TableCell>
@@ -105,6 +108,13 @@ const Booking = ({ userId }) => {
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
+                <TableCell
+                  sx={{ fontSize: "16px", textAlign: "center" }}
+                  component="th"
+                  scope="row"
+                >
+                  {row.ownerId}
+                </TableCell>
                 <TableCell
                   sx={{ fontSize: "16px", textAlign: "center" }}
                   component="th"
@@ -183,10 +193,11 @@ const Booking = ({ userId }) => {
         </Table>
       </TableContainer>
       </>}
-       {editPage && <EditBooking setEditPage={setEditPage}/>}
-       {addPage && <AddPageBooking setAddPage={setAddPage}/>}
+
+       {editPage && <AdminEditBooking setEditPage={setEditPage}/>}
+       {/* {addPage && <AddPageBooking setAddPage={setAddPage}/>} */}
        
     </Box>
   );
 };
-export default Booking;
+export default AdminBooking;

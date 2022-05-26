@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { ApolloError } = require("apollo-server-errors");
 const Pets = require("../../models/petsSchema");
+const User = require("../../models/userSchema");
 
 module.exports = {
   Mutation: {
@@ -15,7 +16,7 @@ module.exports = {
 
       try {
         const res = await newPet.save().then(() => {
-          return Pets.find({});
+          return Pets.find({ ownerId: ownerId });
         });
 
         return res;
@@ -26,8 +27,15 @@ module.exports = {
 
     async getAllPets(_, { getAllPets: { ownerId } }) {
       //get all pets by ownerId
+      const user = await User.find({ _id: ownerId });
+      let pets = "";
       try {
-        const pets = Pets.find({ ownerId: ownerId });
+        if (user[0].username === "Admin") {
+          pets = await Pets.find({});
+        } else {
+          pets = await Pets.find({ ownerId: ownerId });
+        }
+
         return pets;
       } catch (error) {
         throw new ApolloError("cannot find pets", error);
@@ -44,8 +52,12 @@ module.exports = {
       }
     },
 
-    async editPet(_, { editPetInput: { petId, type, breed, size, name } }) {
+    async editPet(_, { editPetInput: { ownerId,petId, type, breed, size, name } }) {
       try {
+        const owner = await User.findOne({ _id: ownerId });
+        let res = "";
+
+
         const existpet = await Pets.findOne({ _id: petId });
         // console.log(existpet);
 
@@ -54,9 +66,15 @@ module.exports = {
         existpet.size = size;
         existpet.name = name;
 
-        const res = await existpet.save().then(() => {
-          return Pets.find({});
-        });
+        if (owner.username !== "Admin") {
+          res = await existpet.save().then(() => {
+            return Pets.find({ownerId:ownerId});
+          });
+        }else{
+          res = await existpet.save().then(() => {
+            return Pets.find({});
+          });
+        }
 
         return res;
       } catch (err) {
@@ -64,11 +82,19 @@ module.exports = {
       }
     },
 
-    async deletePet(_, { deletePetInput: { petId } }) {
+    async deletePet(_, { deletePetInput: { petId, ownerId } }) {
       try {
-        const res = await Pets.deleteOne({ _id: petId }).then(() => {
-          return Pets.find({});
-        });
+        const owner = await User.findOne({ _id: ownerId });
+        let res = "";
+        if (owner.username !== "Admin") {
+          res = await Pets.deleteOne({ _id: petId }).then(() => {
+            return Pets.find({ownerId:ownerId});
+          });
+        }else{
+          res = await Pets.deleteOne({ _id: petId }).then(() => {
+            return Pets.find({});
+          });
+        }
 
         return res;
       } catch (err) {

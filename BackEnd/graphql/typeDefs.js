@@ -68,10 +68,12 @@ input EditPet{
     breed:String
     size:String
     name:String
+    ownerId:ID
 }
 
 input DeletePet{
     petId:ID
+    ownerId:ID
 }
 
 scalar Date
@@ -108,6 +110,7 @@ input UpdateBookingInput{
     note:String
     petName:String
     bookingId:ID
+    ownerId:ID
 }
 
 input GetBookingInput{
@@ -116,6 +119,11 @@ input GetBookingInput{
 
 input DeleteBookingInput{
     bookId:ID
+    ownerId:ID
+}
+
+input DeleteUserInput{
+   email:String
 }
 
 type Mutation {
@@ -132,7 +140,8 @@ type Mutation {
 
     registerUser(registerInput:RegisterInput):User 
     loginUser(loginUserInput:LoginInput):User
-    updateUser(updateUserInput:UpdateInput):User
-    getUser(getUserInput:GetUserInput):User    
+    updateUser(updateUserInput:UpdateInput):[User]
+    getUser(getUserInput:GetUserInput):[User]
+    deleteUser(deleteUserInput:DeleteUserInput):[User]    
 }
 `

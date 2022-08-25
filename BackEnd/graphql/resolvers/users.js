@@ -37,6 +37,7 @@ module.exports = {
       };
     },
 
+
     async loginUser(_, { loginUserInput: { email, password } }) {
       //check if email exists
       const checkUser = await User.findOne({ email });
@@ -73,6 +74,7 @@ module.exports = {
       }
     },
 
+    
     async updateUser(_, { updateUserInput: { username, password, email } }) {
       try {
         const user = await User.findOne({ email: email });
@@ -107,6 +109,7 @@ module.exports = {
   // deleteMany
   async deleteUser(_, { deleteUserInput: { email } }) {
     try {
+      console.log("hello");
       const user = await User.find({ email: email });
       if (user && user.username !== "Admin") {
         await Pets.deleteMany({ ownerId: user._id });
@@ -122,6 +125,7 @@ module.exports = {
       throw new ApolloError("cannot delete this user " + err);
     }
   },
+
   Query: {
     user: (_, { ID }) => User.findById(ID),
   },

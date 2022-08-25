@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { ApolloError } = require("apollo-server-errors");
+const Booking = require("../../models/bookingSchema");
 const Pets = require("../../models/petsSchema");
 const User = require("../../models/userSchema");
 
@@ -101,5 +102,26 @@ module.exports = {
         throw new ApolloError("cannot update this pet " + err);
       }
     },
+
+// deleteMany
+async deleteUser(_, { deleteUserInput: { email } }) {
+  try {
+    console.log("hello");
+    const user = await User.find({ email: email });
+    if (user && user.username !== "Admin") {
+      await Pets.deleteMany({ ownerId: user._id });
+      await Booking.deleteMany({ ownerId: user._id });
+      const res = await User.deleteOne({ email: email }).then(() => {
+        return User.find({});
+      });
+      return res;
+    } else {
+      throw new ApolloError("cannot delete admin email");
+    }
+  } catch (err) {
+    throw new ApolloError("cannot delete this user " + err);
+  }
+},
+
   },
 };

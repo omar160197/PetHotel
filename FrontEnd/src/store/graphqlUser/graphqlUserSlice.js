@@ -4,13 +4,12 @@ import { print } from "graphql";
 import gql from "graphql-tag";
 import { useNavigate } from "react-router-dom";
 
-
 export const loginUser = createAsyncThunk(
   "post/loginUser",
   async (userData, thunkAPI) => {
     console.log(userData);
     const { rejectWithValue } = thunkAPI;
-   
+
     const LOGIN_USER = gql`
       mutation LoginUser($loginUserInput: LoginInput) {
         loginUser(loginUserInput: $loginUserInput) {
@@ -80,22 +79,21 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-
-export const getAllUsers =createAsyncThunk(
+export const getAllUsers = createAsyncThunk(
   "update/updateUser",
   async (userData, thunkAPI) => {
     console.log(userData);
     const { rejectWithValue } = thunkAPI;
 
     const LOGIN_USER = gql`
-    mutation GetUser($getUserInput: GetUserInput) {
-      getUser(getUserInput: $getUserInput) {
-        _id
-        username
-        email
-        password
+      mutation GetUser($getUserInput: GetUserInput) {
+        getUser(getUserInput: $getUserInput) {
+          _id
+          username
+          email
+          password
+        }
       }
-    }
     `;
 
     const res = await axios.post("http://localhost:5000/", {
@@ -153,9 +151,40 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+export const deleteUser = createAsyncThunk(
+  "post/user",
+  async (userData, thunkAPI) => {
+    console.log(userData.userEmail);
+    const { rejectWithValue } = thunkAPI;
 
+    const DELETE_USER = gql`
+      mutation DeleteUser($deleteUserInput: DeleteUser) {
+        deleteUser(deleteUserInput: $deleteUserInput) {
+          _id
+          username
+          email
+          password
+        }
+      }
+    `;
 
-
+    const res = await axios.post("http://localhost:5000/", {
+      query: print(DELETE_USER),
+      variables: {
+        deleteUserInput: {
+          email: userData.userEmail,
+        },
+      },
+    });
+    console.log(res);
+    if (res.data.data.deleteUser !== null) {
+      return res.data.data.deleteUser;
+    } else {
+      console.log(res.data.errors[0].message);
+      return rejectWithValue(res.data.errors[0].message);
+    }
+  }
+);
 
 //Logout
 export const logout = createAsyncThunk("post/logout", async (_, thunkAPI) => {
@@ -171,8 +200,8 @@ let user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = {
   user: user ? user : null,
-  allUsers :[],
-  selectedUser:{},
+  allUsers: [],
+  selectedUser: {},
   isLoading: false,
   isError: null,
   message: null,
@@ -189,8 +218,8 @@ export const graphqlUserSlice = createSlice({
       state.isSuccess = false;
       state.message = "";
     },
-    selectUser:(state,action)=>{
-     state.selectedUser=action.payload
+    selectUser: (state, action) => {
+      state.selectedUser = action.payload;
     },
   },
   extraReducers: {
@@ -215,7 +244,7 @@ export const graphqlUserSlice = createSlice({
     [logout.fulfilled]: (state, action) => {
       console.log(action);
       state.user = null;
-      state.isSuccess=false;
+      state.isSuccess = false;
     },
 
     [updateUser.pending]: (state, action) => {
@@ -232,6 +261,26 @@ export const graphqlUserSlice = createSlice({
     },
 
     [updateUser.rejected]: (state, action) => {
+      console.log(action.payload);
+      state.isLoading = false;
+      state.isError = true;
+      state.message = action.payload;
+    },
+
+    [deleteUser.pending]: (state, action) => {
+      console.log(action);
+      state.isLoading = true;
+      state.isError = null;
+    },
+
+    [deleteUser.fulfilled]: (state, action) => {
+      console.log(action.payload);
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.allUsers = action.payload;
+    },
+
+    [deleteUser.rejected]: (state, action) => {
       console.log(action.payload);
       state.isLoading = false;
       state.isError = true;
@@ -261,5 +310,5 @@ export const graphqlUserSlice = createSlice({
   },
 });
 
-export const { reset , selectUser} = graphqlUserSlice.actions;
+export const { reset, selectUser } = graphqlUserSlice.actions;
 export default graphqlUserSlice.reducer;

@@ -6,7 +6,7 @@ const db=mysql.createConnection({
     user:process.env.DP_USER,
     password:process.env.DP_PASSWORD,
     database:process.env.DP_NAME
+})
 
-}) 
 module.exports=db
 

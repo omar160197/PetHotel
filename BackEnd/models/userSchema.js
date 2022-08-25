@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   bio:{type:String},
   email: {
     type: String,
-    unique:true,
+    // unique:true,
     match: [
       /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
       "Please enter a valid email",

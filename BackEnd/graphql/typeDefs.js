@@ -122,8 +122,8 @@ input DeleteBookingInput{
     ownerId:ID
 }
 
-input DeleteUserInput{
-   email:String
+input DeleteUser{
+    email:String
 }
 
 type Mutation {
@@ -142,6 +142,6 @@ type Mutation {
     loginUser(loginUserInput:LoginInput):User
     updateUser(updateUserInput:UpdateInput):[User]
     getUser(getUserInput:GetUserInput):[User]
-    deleteUser(deleteUserInput:DeleteUserInput):[User]    
+    deleteUser(deleteUserInput:DeleteUser):[User]    
 }
 `

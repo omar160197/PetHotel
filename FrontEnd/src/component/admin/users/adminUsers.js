@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deletePets, getUserPets, selectPet } from "../../../store/pets/petSlice";
 import { useNavigate } from "react-router-dom";
 
-import { getAllUsers, selectUser } from "../../../store/graphqlUser/graphqlUserSlice";
+import { deleteUser, getAllUsers, selectUser } from "../../../store/graphqlUser/graphqlUserSlice";
 import AdminEditUser from "./adminEditUser";
 
 
@@ -69,7 +69,7 @@ const [addPage,setAddPage]=React.useState(false)
                dispatch(selectUser(row))
               }}>Edit</Button> 
               <Button
-            //   onClick={()=>dispatch(deletePets(row._id))}
+              onClick={()=>dispatch(deleteUser({userEmail : row.email}))}
               sx={{color:"red",fontSize:"16px"}} variant="text">Delete</Button></TableCell>
             </TableRow>
           ))}
